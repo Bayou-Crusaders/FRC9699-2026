@@ -14,13 +14,17 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathConstraints;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
@@ -28,6 +32,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.generated.TunerConstants;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 
 /**
@@ -324,4 +329,26 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder", ex.getStackTrace());
         }
     }
+
+    public Command pathfindToPose(Pose2d targetPose) {
+        return AutoBuilder.pathfindToPose(
+            targetPose, 
+            new PathConstraints(
+                3.0, 
+                3.0,
+                Units.degreesToRadians(540), 
+                Units.degreesToRadians(720)
+            )
+        );
+    }
+    
+    public Command rotateToAngle(Rotation2d targetAngle) {
+
+        ChassisSpeeds speeds = new ChassisSpeeds(0, 0, getState().Pose.getRotation().getRadians() - targetAngle.getRadians());
+
+        return run(
+            () -> this.applyRequest(
+                () -> m_pathApplyRobotSpeeds.withSpeeds(speeds))); 
+    }
+
 }

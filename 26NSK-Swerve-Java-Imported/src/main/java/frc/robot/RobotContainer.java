@@ -45,8 +45,6 @@ public class RobotContainer {
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.065) // Add a 6.5% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
-    private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
-    private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
     private final Targeting targeting = new Targeting();
 
@@ -85,12 +83,17 @@ public class RobotContainer {
         // Brake while the robot is disabled. This moves the wheels into
         // an 'x' arrangment to resist all force from all angles
         RobotModeTriggers.disabled().whileTrue(
-            drivetrain.applyRequest(() -> brake).ignoringDisable(true)
+            drivetrain.applyRequest(
+                () -> new SwerveRequest.SwerveDriveBrake()
+            ).ignoringDisable(true)
         );
 
         // While 'A' is pressed, make the robot brake
-        driver.a().whileTrue(drivetrain.applyRequest(() -> brake));
-
+        driver.a().whileTrue(
+            drivetrain.applyRequest(
+                () -> new SwerveRequest.SwerveDriveBrake()
+            )
+        );
         // Reset the field-centric heading on Right bumper press
         driver.rightBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 

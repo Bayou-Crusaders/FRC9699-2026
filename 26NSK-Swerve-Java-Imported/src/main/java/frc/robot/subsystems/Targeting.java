@@ -4,6 +4,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.Robot;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 
 
@@ -23,21 +24,39 @@ public class Targeting implements Subsystem {
         //angleMap.put(null, null); 
     }
 
-    public void moveTargetPose(double x, double y) { // Move the target pose by the specified x and y offsets
+    // Move the target pose by the specified x and y offsets
+    public void moveTargetPose(double x, double y) { 
         target = target.plus(new Translation2d(x, y));
     }
-
-    public Translation2d getTargetPose() { // Get the current target pose as a Translation2d
+    
+    // Get the current target pose as a Translation2d
+    public Translation2d getTargetPose() { 
         return new Translation2d(target.getX(), target.getY());
     }
-
-    public double[] getTargetXY() { // Get the current target pose as an array of x and y coordinates
+    
+    // Get the current target pose as an array of x and y coordinates
+    public double[] getTargetXY() { 
         return new double[] {target.getX(), target.getY()};
     }
 
-    public Double distanceToTarget(Pose2d RobotPose) { // Calculate the distance from the robot's current pose to the target pose
+    // Calculate the distance from the robot's current pose to the target pose
+    public Double distanceToTarget(Pose2d RobotPose) { 
         Translation2d robotPose = RobotPose.getTranslation();
         Translation2d targetPose = this.getTargetPose();
         return robotPose.getDistance(targetPose);
+    }
+
+    public Double distanceFromHub(Pose2d RobotPose) {
+        return RobotPose.getTranslation().getDistance(new Translation2d(0, 0)); // TODO: Find Hub Position
+    }
+
+    // Get the RPM for shooting based on the distance to the target using interpolation
+    public Double getRPMForDistance(double distance) { 
+        return rpmMap.get(distance);
+    }
+
+    // Get the angle for shooting based on the distance to the target using interpolation
+    public Double getAngleForDistance(double distance) { 
+        return angleMap.get(distance);
     }
 }
