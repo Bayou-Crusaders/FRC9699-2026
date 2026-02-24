@@ -343,8 +343,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
     
     public Command rotateToAngle(Rotation2d targetAngle) {
+        double error = targetAngle.minus(getState().Pose.getRotation()).getDegrees();
 
-        ChassisSpeeds speeds = new ChassisSpeeds(0, 0, getState().Pose.getRotation().getRadians() - targetAngle.getRadians());
+        ChassisSpeeds speeds = new ChassisSpeeds(
+            0, 
+            0, 
+            Units.degreesToRadians(error * 0.5) // Proportional control with a gain of 0.5 radians per degree of error
+        ); 
 
         return run(
             () -> this.applyRequest(

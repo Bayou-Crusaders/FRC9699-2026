@@ -7,6 +7,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.text.ParseException;
 
 import edu.wpi.first.math.util.Units;
@@ -106,9 +107,10 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
+        PathPlannerPath path = null;
         try {
             // Load the path we want to pathfind to and follow
-            PathPlannerPath path = PathPlannerPath.fromPathFile("test");
+            path = PathPlannerPath.fromPathFile("test");
         } catch (IOException | org.json.simple.parser.ParseException | FileVersionException e) {
             System.out.println("Failed to load path file");
         }

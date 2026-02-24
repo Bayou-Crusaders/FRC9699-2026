@@ -4,8 +4,11 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.Robot;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+
+import frc.robot.Util;
 
 
 public class Targeting implements Subsystem {
@@ -41,13 +44,28 @@ public class Targeting implements Subsystem {
 
     // Calculate the distance from the robot's current pose to the target pose
     public Double distanceToTarget(Pose2d RobotPose) { 
-        Translation2d robotPose = RobotPose.getTranslation();
-        Translation2d targetPose = this.getTargetPose();
-        return robotPose.getDistance(targetPose);
+        return RobotPose.getTranslation().getDistance(this.getTargetPose());
+    }
+
+    public Double angleToTarget(Pose2d RobotPose) {
+        Translation2d robotTranslation = RobotPose.getTranslation();
+        Translation2d targetTranslation = this.getTargetPose();
+        double angleToTarget = Math.atan2(targetTranslation.getY() - robotTranslation.getY(), targetTranslation.getX() - robotTranslation.getX());
+        return Math.toDegrees(angleToTarget);
+    }
+
+    public Double angleToTarget(Pose2d RobotPose, Translation2d targetIn) {
+        Translation2d robotTranslation = RobotPose.getTranslation();
+        double angleToTarget = Math.atan2(targetIn.getY() - robotTranslation.getY(), targetIn.getX() - robotTranslation.getX());
+        return Math.toDegrees(angleToTarget);
     }
 
     public Double distanceFromHub(Pose2d RobotPose) {
-        return RobotPose.getTranslation().getDistance(new Translation2d(0, 0)); // TODO: Find Hub Position
+        if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red) {
+            return RobotPose.getTranslation().getDistance(Util.redHubPose.getTranslation());
+        } else {
+            return RobotPose.getTranslation().getDistance(Util.blueHubPose.getTranslation());
+        }
     }
 
     // Get the RPM for shooting based on the distance to the target using interpolation
