@@ -11,22 +11,22 @@ import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Targeting;
 
 public class shootToHub extends Command {
-    private CommandSwerveDrivetrain drivetrain;
+    private CommandSwerveDrivetrain m_drivetrain;
     private Shooter shooter;
     private Targeting targeting;
     private Translation2d targetHubTranslation;
     private Pose2d nearestShootingPose;
     
     public shootToHub(CommandSwerveDrivetrain drivetrain, Shooter shooter, Targeting targeting) {
-        this.drivetrain = drivetrain;
-        this.shooter = shooter;
-        this.targeting = targeting;
+        m_drivetrain = drivetrain;
+        m_shooter = shooter;
+        m_targeting = targeting;
     }
 
     @Override
     public void initialize() {
         // Get the robot's current pose
-        Pose2d robotPose = drivetrain.getState().Pose;
+        Pose2d robotPose = m_drivetrain.getState().Pose;
 
         // Find the nearest shooting pose to the robot's current pose based on the alliance
         nearestShootingPose = (Util.getAlliance() == Alliance.Blue)
@@ -39,20 +39,19 @@ public class shootToHub extends Command {
                 : Util.redHubPose.getTranslation();
 
         // Drive to the nearest shooting pose
-        drivetrain.pathfindToPose(nearestShootingPose);
+        m_drivetrain.pathfindToPose(nearestShootingPose);
     }
 
     @Override
     public void execute() {
         
         // Once at the shooting pose, calculate the distance to the target and the angle to the target
-        if (drivetrain.getState().Pose.getTranslation().getDistance(nearestShootingPose.getTranslation()) < 0.1) { // If the robot is within 10 cm of the shooting pose
-            double distanceToTarget = targeting.distanceFromHub(drivetrain.getState().Pose);
-            double angleToTarget = targeting.angleToTarget(drivetrain.getState().Pose, targetHubTranslation);
+        if (m_drivetrain.getState().Pose.getTranslation().getDistance(nearestShootingPose.getTranslation()) < 0.1) { // If the robot is within 10 cm of the shooting pose
+            double distanceToTarget = targeting.distanceFromHub(m_drivetrain.getState().Pose);
 
             // Use the distance and angle to set the shooter speed and angle
-            shooter.setFlywheelRPM(distanceToTarget);
-            shooter.setPitchAngle(angleToTarget);
+            shooter.setFlywheelRPM(targeting.getRPMForDistance(distanceToTarget));
+            shooter.setPitchAngle(targeting.getAngleForDistance(distanceToTarget));
         } else {
             // do nothing while driving towards the shooting pose
         }
