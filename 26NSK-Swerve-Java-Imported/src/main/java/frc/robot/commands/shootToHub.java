@@ -12,8 +12,8 @@ import frc.robot.subsystems.Targeting;
 
 public class shootToHub extends Command {
     private CommandSwerveDrivetrain m_drivetrain;
-    private Shooter shooter;
-    private Targeting targeting;
+    private Shooter m_shooter;
+    private Targeting m_targeting;
     private Translation2d targetHubTranslation;
     private Pose2d nearestShootingPose;
     
@@ -47,11 +47,11 @@ public class shootToHub extends Command {
         
         // Once at the shooting pose, calculate the distance to the target and the angle to the target
         if (m_drivetrain.getState().Pose.getTranslation().getDistance(nearestShootingPose.getTranslation()) < 0.1) { // If the robot is within 10 cm of the shooting pose
-            double distanceToTarget = targeting.distanceFromHub(m_drivetrain.getState().Pose);
+            double distanceToTarget = m_targeting.distanceFromHub(m_drivetrain.getState().Pose);
 
             // Use the distance and angle to set the shooter speed and angle
-            shooter.setFlywheelRPM(targeting.getRPMForDistance(distanceToTarget));
-            shooter.setPitchAngle(targeting.getAngleForDistance(distanceToTarget));
+            m_shooter.setFlywheelRPM(m_targeting.getRPMForDistance(distanceToTarget));
+            m_shooter.setPitchAngle(m_targeting.getAngleForDistance(distanceToTarget));
         } else {
             // do nothing while driving towards the shooting pose
         }
@@ -60,7 +60,7 @@ public class shootToHub extends Command {
     @Override
     public void end(boolean interrupted) {
         // Stop the shooter when the command ends
-        shooter.setFlywheelRPM(0);
+        m_shooter.setFlywheelRPM(0);
     }
 
 }
