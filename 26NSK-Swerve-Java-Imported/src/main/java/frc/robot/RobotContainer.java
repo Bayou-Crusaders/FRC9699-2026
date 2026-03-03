@@ -30,8 +30,11 @@ import com.pathplanner.lib.auto.AutoBuilder;
 
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-
+import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Targeting;
+import frc.robot.commands.shootToHub;
+import frc.robot.commands.shootToTarget;
+
 
 
 
@@ -49,12 +52,14 @@ public class RobotContainer {
 
     private final Targeting targeting = new Targeting();
 
+    private final Shooter shooter = new Shooter(0, 0, 0);
+
     private final Telemetry logger = new Telemetry(MaxSpeed, targeting); 
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     final CommandXboxController driver = new CommandXboxController(0);
-    final CommandJoystick shooter = new CommandJoystick(1);
+    final CommandJoystick shooterJoystick = new CommandJoystick(1);
 
     // Create the constraints to use while pathfinding. The constraints defined in the path will only be used for the path.
     PathConstraints constraints = new PathConstraints(
@@ -98,10 +103,15 @@ public class RobotContainer {
         // Reset the field-centric heading on Right bumper press
         driver.rightBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-        // When both 'x' and Button 5 on the shooter joystick are pressed, run the shooting command
-        //driver.x().and(shooter.button(5)).onTrue(
-        //    null //TODO: Add shoot command
-        //);
+        // When both 'x' and Button 5 on the shooter joystick are pressed, run the shootToHub command
+        driver.x().and(shooterJoystick.button(5)).whileTrue(
+            new shootToHub(drivetrain, shooter, targeting)
+        );
+
+        // When both 'x' and Button 6 on the shooter joystick are pressed, run the shootToTarget command
+        driver.x().and(shooterJoystick.button(6)).whileTrue(
+            new shootToTarget(drivetrain, shooter, targeting)
+        );
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }

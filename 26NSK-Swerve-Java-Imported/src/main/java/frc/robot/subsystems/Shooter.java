@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 
-@SuppressWarnings("unused")
+
 public class Shooter implements Subsystem {
     // Initialize the objects and variables
     TalonFX rightFlywheel;
@@ -57,7 +57,11 @@ public class Shooter implements Subsystem {
         .withKD(0) // The derivative gain
         .withKS(0) // The static gain
         .withKV(0) // The velocity gain
-        .withKA(0); // The acceleration gain
+        .withKA(0) // The acceleration gain
+        .withKG(0); // The gravity gain
+
+        leftFlywheel.getConfigurator().apply(shooterGains);
+        pitchMotor.getConfigurator().apply(pitchGains);
     }
 
     public Command setFlywheelRPM(double rpm) { // Set the flywheel speed in RPM
