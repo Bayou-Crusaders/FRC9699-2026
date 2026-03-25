@@ -5,6 +5,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.configs.*;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -12,6 +14,7 @@ import java.util.function.BooleanSupplier;
 
 public class CommandClimber implements Subsystem{
     private TalonFX climberMotor;
+    private TalonFXConfiguration climbConfig;
 
     // Define a constant for zero angular velocity to compare against
     public static final AngularVelocity kZero = RotationsPerSecond.of(0);
@@ -19,6 +22,10 @@ public class CommandClimber implements Subsystem{
     public CommandClimber(){
         // Initialize the TalonFX motor controller for the climber
         climberMotor = new TalonFX(8);
+
+        climbConfig.withSlot0(new Slot0Configs().withKP(0).withKD(0).withKG(0).withGravityType(GravityTypeValue.Elevator_Static)).withSlot1(new Slot1Configs().withKP(0).withKD(0).withKG(0).withGravityType(GravityTypeValue.Elevator_Static)).withCurrentLimits(new CurrentLimitConfigs().withStatorCurrentLimit(60)).withFeedback(FeedbackConfigs.SensorToMechanismRatio(48)); //TODO: Tune these
+
+        climberMotor.getConfigurator().apply(climbConfig());
     }
 
     // Method to check if the motor is stopped by comparing its velocity to zero
