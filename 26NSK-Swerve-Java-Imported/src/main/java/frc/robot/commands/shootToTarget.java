@@ -14,6 +14,8 @@ public class shootToTarget extends Command {
     Shooter m_shooter;
     Targeting m_targeting;
     Double angleToRotate;
+    Pose2d referencePose;
+    Pose2d robotPose;
 
     public shootToTarget(
         CommandSwerveDrivetrain drivetrain, 
@@ -28,16 +30,19 @@ public class shootToTarget extends Command {
     @Override
     public void initialize() {
         // Get the robot's current pose
-        Pose2d robotPose = m_drivetrain.getState().Pose;
-
+        robotPose = m_drivetrain.getState().Pose;
+        
         angleToRotate = m_targeting.angleToTarget(robotPose, m_targeting.getTargetPose());
+        
+        // Set a reference pose for the robot
+        referencePose = robotPose.rotateBy(new Rotation2d(Units.degreesToRadians(angleToRotate)));
 
         m_drivetrain.rotateToAngle(new Rotation2d(Units.degreesToRadians(angleToRotate)));
     }
 
     @Override
     public void execute() {
-        if (m_drivetrain.getState().Pose.getRotation() == new Rotation2d(Units.degreesToRadians(angleToRotate))) {
+        if (m_drivetrain.getState().Pose.getRotation().getDegrees() - referencePose.getRotation().getDegrees() < 5) { // If the robot is within 5 degrees of the target angle
             double distanceToTarget = m_targeting.distanceFromHub(m_drivetrain.getState().Pose);
 
             // Use the distance and angle to set the shooter speed and angle

@@ -1,7 +1,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -14,7 +13,6 @@ public class shootToHub extends Command {
     private CommandSwerveDrivetrain m_drivetrain;
     private Shooter m_shooter;
     private Targeting m_targeting;
-    private Translation2d targetHubTranslation;
     private Pose2d nearestShootingPose;
     
     public shootToHub(CommandSwerveDrivetrain drivetrain, Shooter shooter, Targeting targeting) {
@@ -32,11 +30,6 @@ public class shootToHub extends Command {
         nearestShootingPose = (Util.getAlliance() == Alliance.Blue)
                 ? robotPose.nearest(Util.shootToBlueHubPoses)
                 : robotPose.nearest(Util.shootToRedHubPoses);
-
-        // Find the Translation2d of the hub based on the alliance
-        targetHubTranslation = (Util.getAlliance() == Alliance.Blue)
-                ? Util.blueHubPose.getTranslation()
-                : Util.redHubPose.getTranslation();
 
         // Drive to the nearest shooting pose
         m_drivetrain.pathfindToPose(nearestShootingPose);
