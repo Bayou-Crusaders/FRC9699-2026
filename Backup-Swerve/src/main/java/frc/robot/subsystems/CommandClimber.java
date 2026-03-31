@@ -38,8 +38,14 @@ public class CommandClimber implements Subsystem{
     }
 
     // Method to check if the motor is stopped by comparing its velocity to zero
-    private BooleanSupplier isMotorStopped() {
-        return () -> {return climberMotor.getVelocity().getValue() == kZero;};
+    private BooleanSupplier isMotorStopped(boolean not) {
+        return () -> {
+            if (not == true) {
+                return climberMotor.getVelocity().getValue() == kZero;
+            } else {
+                return climberMotor.getVelocity().getValue() != kZero;
+            }
+        };
     }
 
     // Method to check if the motor is stalled by comparing its current to the stall threshold
@@ -49,12 +55,12 @@ public class CommandClimber implements Subsystem{
 
     // Command to move the climber up, which runs the motor at 50% power unless the motor is stopped
     public Command climberUp() {
-        return run(() -> climberMotor.set(0.5)).unless(isMotorStopped());
+        return run(() -> climberMotor.set(0.5)).onlyWhile(isMotorStopped(false));
     }
 
     // Command to move the climber down, which runs the motor at 50% power unless the motor is stopped
     public Command climberDown() {
-        return run(() -> climberMotor.set(-0.5)).unless(isMotorStopped());
+        return run(() -> climberMotor.set(-0.5)).onlyWhile(isMotorStopped(false));
     }
 
     public Command homeClimber() {
