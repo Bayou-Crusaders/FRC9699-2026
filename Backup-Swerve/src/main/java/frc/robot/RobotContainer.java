@@ -96,7 +96,11 @@ public class RobotContainer {
                     .withVelocityY(0)
                     .withRotationalRate(0)
             )
-            .withTimeout(5.0),
+            .withTimeout(5.0)
+
+            // While driving forward, also run the climber homing command to prepare for teleop climbing.
+            .alongWith(climber.homeClimber()),
+
             // Finally idle for the rest of auto
             drivetrain.applyRequest(() -> idle)
         );
