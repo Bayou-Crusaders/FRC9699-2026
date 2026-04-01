@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
 import com.ctre.phoenix6.configs.*;
+import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 
@@ -49,22 +50,28 @@ public class CommandClimber implements Subsystem{
     }
 
     // Method to check if the motor is stalled by comparing its current to the stall threshold
-    private BooleanSupplier isMotorStalled() {
-        return () -> {return climberMotor.getTorqueCurrent().getValueAsDouble() >= climbConfig.CurrentLimits.StatorCurrentLimit;};
+    private BooleanSupplier isMotorStalled(boolean not) {
+        return () -> {
+            if (not == true) {
+                return climberMotor.getTorqueCurrent().getValueAsDouble() >= climbConfig.CurrentLimits.StatorCurrentLimit;
+            } else {
+                return climberMotor.getTorqueCurrent().getValueAsDouble() < climbConfig.CurrentLimits.StatorCurrentLimit;
+            }
+        };
     }
 
     // Command to move the climber up, which runs the motor at 50% power unless the motor is stopped
     public Command climberUp() {
-        return run(() -> climberMotor.set(0.5)).onlyWhile(isMotorStopped(false));
+        return run(() -> climberMotor.set(0.5)).onlyWhile(isMotorStalled(false)).finallyDo(() -> climberMotor.setControl(new StaticBrake()));
     }
 
     // Command to move the climber down, which runs the motor at 50% power unless the motor is stopped
     public Command climberDown() {
-        return run(() -> climberMotor.set(-0.5)).onlyWhile(isMotorStopped(false));
+        return run(() -> climberMotor.set(-0.5)).onlyWhile(isMotorStalled(false)).finallyDo(() -> climberMotor.setControl(new StaticBrake()));
     }
 
     public Command homeClimber() {
         // Command to home the climber, which runs the motor at -50% power until the motor is stalled
-        return run(() -> climberMotor.set(-0.5)).until(isMotorStalled()).finallyDo(() -> climberMotor.setPosition(0));
+        return run(() -> climberMotor.set(-0.5)).until(isMotorStalled(false)).finallyDo(() -> climberMotor.setPosition(0));
     }
 }
