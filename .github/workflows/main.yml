@@ -31,18 +31,6 @@ jobs:
     - name: Build Backup Swerve Robot
       run: cd Backup-Swerve && ./gradlew build
 
-  build-tank-command:
-    runs-on: ubuntu-22.04
-    container: wpilib/roborio-cross-ubuntu:2025-22.04
-    steps:
-    - uses: actions/checkout@v4
-    - name: Add repository to git safe directories
-      run: git config --global --add safe.directory $GITHUB_WORKSPACE
-    - name: Grant execute permission for gradlew
-      run: chmod +x Java-Tank/Java-Tank_Command/gradlew
-    - name: Build Tank Robot
-      run: cd Java-Tank/Java-Tank_Command && ./gradlew build
-
   build-tank-timed:
     runs-on: ubuntu-22.04
     container: wpilib/roborio-cross-ubuntu:2025-22.04
