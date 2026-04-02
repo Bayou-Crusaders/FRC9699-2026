@@ -73,8 +73,8 @@ public class TunerConstants {
     public static final CANBus kCANBus = new CANBus("", "./logs/example.hoot");
 
     // Theoretical free speed (m/s) at 12 V applied output;
-    // This needs to be tuned to your individual robot
-    public static final LinearVelocity kSpeedAt12Volts = MetersPerSecond.of(5.23);
+    // This needs to be tuned to your individual robot (TUNED)
+    public static final LinearVelocity kSpeedAt12Volts = MetersPerSecond.of(5.9436);
 
     // Every 1 rotation of the azimuth results in kCoupleRatio drive motor turns;
     // This may need to be tuned to your individual robot

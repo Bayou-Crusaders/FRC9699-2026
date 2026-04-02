@@ -16,7 +16,7 @@ import java.util.function.BooleanSupplier;
 
 public class CommandClimber implements Subsystem{
     private TalonFX climberMotor;
-    private TalonFXConfiguration climbConfig;
+    private TalonFXConfiguration climbConfig = new TalonFXConfiguration();
 
     // Define a constant for zero angular velocity to compare against
     public static final AngularVelocity kZero = RotationsPerSecond.of(0);
