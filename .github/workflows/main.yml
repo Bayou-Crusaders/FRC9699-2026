@@ -7,7 +7,28 @@ on:
     branches: [ main ]
 
 jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      swerve: ${{ steps.changes.outputs.swerve }}
+      backup-swerve: ${{ steps.changes.outputs.backup_swerve }}
+      tank-timed: ${{ steps.changes.outputs.tank_timed }}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: dorny/paths-filter@v2
+      id: changes
+      with:
+        filters: |
+          swerve:
+            - '26NSK-Swerve-Java-Imported/**'
+          backup_swerve:
+            - 'Backup-Swerve/**'
+          tank_timed:
+            - 'Java-Tank/Java-Tank_Timed/**'
+
   build-swerve:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.swerve == 'true'
     runs-on: ubuntu-22.04
     container: wpilib/roborio-cross-ubuntu:2025-22.04
     steps:
@@ -20,6 +41,8 @@ jobs:
       run: cd 26NSK-Swerve-Java-Imported && ./gradlew build
 
   build-backup-swerve:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.backup_swerve == 'true'
     runs-on: ubuntu-22.04
     container: wpilib/roborio-cross-ubuntu:2025-22.04
     steps:
@@ -32,6 +55,8 @@ jobs:
       run: cd Backup-Swerve && ./gradlew build
 
   build-tank-timed:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.tank_timed == 'true'
     runs-on: ubuntu-22.04
     container: wpilib/roborio-cross-ubuntu:2025-22.04
     steps:
