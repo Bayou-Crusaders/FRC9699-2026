@@ -135,9 +135,10 @@ public class RobotContainer {
             }, drivetrain, shooter));
         
         // Allow the operator to move the target pose with the left joystick
-        new Trigger(() -> operator.isConnected()).whileTrue(Commands.runOnce(() -> 
-            targeting.moveTargetPose(operator.getLeftX(), operator.getLeftY())
-        ));
+        new Trigger(() -> true).whileTrue(Commands.run(() -> {
+            targeting.moveTargetPose(operator.getLeftX(), operator.getLeftY());
+            logger.acceptTargetPose(new Pose2d(targeting.getTargetPose(), new Rotation2d(0.0)));
+        }));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }

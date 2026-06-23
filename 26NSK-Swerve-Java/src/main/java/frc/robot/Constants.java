@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 
-/*  A class for utility functions that can be used across multiple files*/
+/** A class for utility functions that can be used across multiple files */
 public class Constants {
     //TODO: Update these poses to be the actual shooting poses for the blue and red hubs
     public static Collection<Pose2d> shootToBlueHubPoses = List.of(

@@ -17,13 +17,13 @@ public class Targeting {
 
     public Targeting() {
         // Use the following InterpolatingDoubleTreeMaps to map distance to RPM and distance to angle for shooting
-        //rpmMap.put(null, null); // Distance (m) to RPM (RPM) mapping
-        //rpmMap.put(null, null); 
-        //rpmMap.put(null, null); 
+        rpmMap.put(0.0, 0.0); // Distance (m) to RPM (RPM) mapping
+        rpmMap.put(0.0, 0.0); 
+        rpmMap.put(0.0, 0.0); 
 
-        //angleMap.put(null, null); // Distance (m) to angle (degrees) mapping
-        //angleMap.put(null, null); 
-        //angleMap.put(null, null); 
+        angleMap.put(0.0, 0.0); // Distance (m) to angle (degrees) mapping
+        angleMap.put(0.0, 0.0); 
+        angleMap.put(0.0, 0.0); 
     }
 
     // Move the target pose by the specified x and y offsets
