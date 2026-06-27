@@ -17,6 +17,7 @@ public class Targeting {
 
     public Targeting() {
         // Use the following InterpolatingDoubleTreeMaps to map distance to RPM and distance to angle for shooting
+        // TODO: Find the real mapped values for RPM and Angle
         rpmMap.put(0.0, 0.0); // Distance (m) to RPM (RPM) mapping
         rpmMap.put(0.0, 0.0); 
         rpmMap.put(0.0, 0.0); 
