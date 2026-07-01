@@ -35,12 +35,20 @@ public class Vision {
     }
 
     public void applyEstimatedPose() {
-        for (var result : camera.getAllUnreadResults()) {
-            visionEst = photonEstimator.estimateCoprocMultiTagPose(result);
-            if (visionEst.isEmpty()) {
-                visionEst = photonEstimator.estimateLowestAmbiguityPose(result);
+        if (!camera.getAllUnreadResults().isEmpty()) {
+            for (var result : camera.getAllUnreadResults()) {
+                visionEst = photonEstimator.estimateCoprocMultiTagPose(result);
+                if (visionEst.isEmpty()) {
+                    visionEst = photonEstimator.estimateLowestAmbiguityPose(result);
+                }
+                kdrivetrain.addVisionMeasurement(visionEst.get().estimatedPose.toPose2d(), visionEst.get().timestampSeconds);
             }
-            kdrivetrain.addVisionMeasurement(visionEst.get().estimatedPose.toPose2d(), visionEst.get().timestampSeconds);
+        } else {
+            visionEst = Optional.empty();
         }
+    }
+
+    public Boolean hasNewPose() {
+        return visionEst.isPresent();
     }
 }

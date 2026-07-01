@@ -7,8 +7,6 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
-import frc.robot.Constants;
-
 
 public class Targeting {
     private Translation2d target = new Translation2d();

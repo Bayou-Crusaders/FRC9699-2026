@@ -15,11 +15,12 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.Constants;
 
 // TODO: Get real CAN IDs and PID values for the shooter motors, and tune the PID values for the pitch motor
 
 public class CommandShooter implements Subsystem {
-    private CANBus kCANBus = new CANBus("rio");
+    private CANBus kCANBus = Constants.getRIOCANBus();
     private TalonFX m_rightFly = new TalonFX(0, kCANBus);
     private TalonFX m_leftFly = new TalonFX(0, kCANBus);
     private TalonFX m_pitch = new TalonFX(0, kCANBus);

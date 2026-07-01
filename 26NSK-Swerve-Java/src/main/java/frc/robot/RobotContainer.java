@@ -26,6 +26,8 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Vision;
 import frc.robot.subsystems.CommandShooter;
+import frc.robot.subsystems.Hopper;
+import frc.robot.subsystems.Intake;
 import frc.robot.Targeting;
 
 @SuppressWarnings("unused")
@@ -51,6 +53,8 @@ public class RobotContainer {
     public final CommandShooter shooter = new CommandShooter();
     public final Targeting targeting = new Targeting();
     public final Vision vision = new Vision(drivetrain);
+    public final Hopper hopper = new Hopper();
+    public final Intake intake = new Intake();
     
     public RobotContainer() {
         configureBindingsXbox();
@@ -91,7 +95,7 @@ public class RobotContainer {
         // Reset the field-centric heading on left bumper press.
         joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
-        // Shoot to the target when the right bumper is 
+        // Shoot to the target
         operator.rightBumper().and(joystick.b()).onTrue(Commands.runOnce(() -> {
             drivetrain.applyRequest(() -> rotate
                 .withTargetDirection(new Rotation2d(
@@ -106,11 +110,13 @@ public class RobotContainer {
                     targeting.distanceToTarget(new Pose2d(targeting.getTargetPose(), new Rotation2d()))
                 )
             );
+            hopper.setHopperAndKickerSpeed(0.5, 0.5);
         }, drivetrain, shooter)).onFalse(Commands.runOnce(
             () -> {
                 drivetrain.applyRequest(() -> new SwerveRequest.Idle());
                 shooter.stop();
-            }, drivetrain, shooter));
+                hopper.stopHopper();
+            }, drivetrain, shooter, hopper));
 
         // Shoot on the Hub
         operator.leftBumper().and(joystick.b()).onTrue(Commands.startEnd(
@@ -121,28 +127,36 @@ public class RobotContainer {
                     : Constants.shootToRedHubPoses;
                 drivetrain.pathFindToPose(
                     drivetrain.getState().Pose.nearest(selectedPoses)
-                ).andThen(
+                ).andThen(Commands.parallel(
                     shooter.setSpeedAndPitch(
                         targeting.getRPMForDistance(
                             targeting.distanceFromHub(drivetrain.getState().Pose)
                         ), targeting.getAngleForDistance(
                             targeting.distanceFromHub(drivetrain.getState().Pose)
                         )
-                    )
+                    ), hopper.setHopperAndKickerSpeed(0.5, 0.5))
                 );
             }, 
             () -> {
-                drivetrain.getCurrentCommand().cancel(); 
+                drivetrain.applyRequest(() -> new SwerveRequest.Idle());
                 shooter.stop();
-            }, drivetrain, shooter));
+                hopper.stopHopper();
+            }, drivetrain, shooter, hopper));
+        
+        // TODO: Find pitch of intake for stowed and deployed
+        // Deploy and turn on intake
+        operator.povDown().onTrue(Commands.run(() -> intake.setPitchAndSpeed(Units.degreesToRotations(90), 100), intake));
+
+        // Retract and turn off intake
+        operator.povUp().onTrue(Commands.run(() -> intake.setPitchAndSpeed(Units.degreesToRotations(0), 0), intake));
         
         // Allow the operator to move the target pose with the left joystick
         new Trigger(() -> true).whileTrue(Commands.run(() -> {
             targeting.moveTargetPose(operator.getLeftX(), operator.getLeftY());
             logger.acceptTargetPose(new Pose2d(targeting.getTargetPose(), new Rotation2d(0.0)));
         }));
-
-        vision.applyEstimatedPose();
+        
+        new Trigger(() -> vision.hasNewPose()).whileTrue(Commands.run(() -> vision.applyEstimatedPose()));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
@@ -191,10 +205,12 @@ public class RobotContainer {
                     targeting.distanceToTarget(new Pose2d(targeting.getTargetPose(), new Rotation2d()))
                 )
             );
+            hopper.setHopperAndKickerSpeed(0.5, 0.5);
         }, drivetrain, shooter)).onFalse(Commands.runOnce(
             () -> {
                 drivetrain.applyRequest(() -> new SwerveRequest.Idle());
                 shooter.stop();
+                hopper.stopHopper();
             }, drivetrain, shooter));
 
         // Shoot on the Hub
@@ -206,25 +222,35 @@ public class RobotContainer {
                     : Constants.shootToRedHubPoses;
                 drivetrain.pathFindToPose(
                     drivetrain.getState().Pose.nearest(selectedPoses)
-                ).andThen(
+                ).andThen(Commands.parallel(
                     shooter.setSpeedAndPitch(
                         targeting.getRPMForDistance(
                             targeting.distanceFromHub(drivetrain.getState().Pose)
                         ), targeting.getAngleForDistance(
                             targeting.distanceFromHub(drivetrain.getState().Pose)
                         )
-                    )
+                    ), hopper.setHopperAndKickerSpeed(0.5, 0.5))
                 );
             }, 
             () -> {
-                drivetrain.getCurrentCommand().cancel(); 
+                drivetrain.applyRequest(() -> new SwerveRequest.Idle()); 
                 shooter.stop();
+                hopper.stopHopper();
             }, drivetrain, shooter));
 
+        // TODO: Find pitch of intake for stowed and deployed
+        // Deploy and turn on intake
+        operator.povDown().onTrue(Commands.run(() -> intake.setPitchAndSpeed(Units.degreesToRotations(90), 100), intake));
+
+        // Retract and turn off intake
+        operator.povUp().onTrue(Commands.run(() -> intake.setPitchAndSpeed(Units.degreesToRotations(0), 0), intake));
+
         // Allow the operator to move the target pose with the joystick
-        new Trigger(() -> operator.isConnected()).whileTrue(Commands.runOnce(() -> 
+        new Trigger(() -> true).whileTrue(Commands.runOnce(() -> 
             targeting.moveTargetPose(operator.getX(), operator.getY())
         ));
+
+        new Trigger(() -> vision.hasNewPose()).whileTrue(Commands.run(() -> vision.applyEstimatedPose()));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }

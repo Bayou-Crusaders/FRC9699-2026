@@ -3,6 +3,8 @@ package frc.robot;
 import java.util.Collection;
 import java.util.List;
 
+import com.ctre.phoenix6.CANBus;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -27,6 +29,10 @@ public class Constants {
 
     public static Alliance getAlliance() {
         return DriverStation.getAlliance().orElse(Alliance.Blue);
+    }
+
+    public static CANBus getRIOCANBus() {
+        return new CANBus("rio");
     }
 
 }
